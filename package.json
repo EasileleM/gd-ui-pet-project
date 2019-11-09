@@ -1,0 +1,17 @@
+{
+  "name": "gd-ui-pet-project",
+  "version": "1.0.0",
+  "description": "Crud pet project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently --kill-others \"npm run start --prefix ./users\" \"npm run start --prefix ./goals\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EasileleM/gd-ui-pet-project.git"
+  },
+  "devDependencies": {
+    "concurrently": "^5.0.0"
+  }
+}
