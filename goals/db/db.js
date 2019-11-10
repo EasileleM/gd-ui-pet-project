@@ -72,8 +72,7 @@ export default class db {
     }
     return this.dbPromise.then(db => {
       return db
-        .find({ "_id": MongoDB.ObjectId(goalID), "userId": MongoDB.ObjectId(userID) })
-        .toArray();
+        .findOne({ "_id": MongoDB.ObjectId(goalID), "userId": MongoDB.ObjectId(userID) })
     })
   }
 
@@ -94,7 +93,8 @@ export default class db {
     for (const field in goalTemplate) {
       filteredItem[field] = item[field];
     }
-    filteredItem.userId = userID;
+    filteredItem.userId = MongoDB.ObjectId(userID);
+    filteredItem.creationDate = new Date();
     return this.dbPromise.then(db => db.insertOne(filteredItem));
   }
 
@@ -104,13 +104,32 @@ export default class db {
     }
     const filteredUpdates = {};
     for (const field in goalTemplate) {
-      if (updates.hasOwnProperty(field)) {
+      if (updates.hasOwnProperty(field) && field != 'creationDate' && field != 'userId') {
         filteredUpdates[field] = updates[field];
       }
     }
     return this.dbPromise
       .then((db) => {
         return db.updateOne({ "_id": MongoDB.ObjectId(id) }, { $set: filteredUpdates });
+      });
+  }
+
+  updateByUserId(goalID, userID, updates) {
+    if (!MongoDB.ObjectId.isValid(userID)) {
+      return Promise.reject(new Error(`BAD USER ID`));
+    }
+    if (!MongoDB.ObjectId.isValid(goalID)) {
+      return Promise.reject(new Error(`BAD GOAL ID`));
+    }
+    const filteredUpdates = {};
+    for (const field in goalTemplate) {
+      if (updates.hasOwnProperty(field)) {
+        filteredUpdates[field] = updates[field];
+      }
+    }
+    return this.dbPromise
+      .then((db) => {
+        return db.updateOne({ "_id": MongoDB.ObjectId(goalID), "userId": MongoDB.ObjectId(userID) }, { $set: filteredUpdates });
       });
   }
 
@@ -124,7 +143,7 @@ export default class db {
       });
   }
 
-  deleteUserGoalById(goalID, userID) {
+  deleteByUserId(goalID, userID) {
     if (!MongoDB.ObjectId.isValid(userID)) {
       return Promise.reject(new Error(`BAD USER ID`));
     }

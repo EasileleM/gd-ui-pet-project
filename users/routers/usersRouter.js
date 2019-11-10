@@ -1,11 +1,19 @@
 import express from 'express';
+import {goalsRouter} from './goalsRouter';
 import cors from 'cors';
+
+const repassUserID = (req, res, next) => {
+  req.userID = req.params.userID;
+  next();
+}
 
 export const usersRouter = express.Router()
 
-goalsRouter.use(cors());
+usersRouter.use(cors());
 
-goalsRouter.use(express.json());
+usersRouter.use(express.json());
+
+usersRouter.use('/:userID/goals', repassUserID, goalsRouter);
 
 // all users
 usersRouter.get('/', (req, res) => res.send('Hello World!'));

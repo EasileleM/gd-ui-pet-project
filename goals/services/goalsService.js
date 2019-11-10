@@ -40,11 +40,15 @@ export default class goalService {
     return dbInstance
       .getByUsersId(req.params.userID)
       .then((item) => {
+        if (!item) {
+          res.status(404).send(`NOT FOUND: ${req.params.goalID}`);
+          return;
+        }
         res.status(200).send(JSON.stringify(item));
       })
       .catch((err) => {
         if (err.message === `BAD ID`) {
-          res.status(400).send(`BAD ID: ${req.params.goalID}`);
+          res.status(400).send(`BAD ID: ${req.params.userID}`);
           return;
         }
         throw err;
@@ -83,7 +87,7 @@ export default class goalService {
       })
   }
 
-  deleteGoal(req, res) {
+  delete(req, res) {
     return dbInstance
       .deleteById(req.params.goalID)
       .then((result) => {
@@ -103,6 +107,64 @@ export default class goalService {
       .catch((err) => {
         res.status(500).send();
       });
+  }
+
+  deleteByUserId(req, res) {
+    return dbInstance
+      .deleteByUserId(req.params.goalID, req.params.userID)
+      .then((result) => {
+        if (!result.result.n) {
+          res.status(404).send();
+          return;
+        }
+        res.status(200).send();
+      })
+      .catch((err) => {
+        if (err.message === `BAD USER ID`) {
+          res.status(400).send();
+          return;
+        }
+        throw err;
+      })
+      .catch((err) => {
+        if (err.message === `BAD GOAL ID`) {
+          res.status(400).send();
+          return;
+        }
+        throw err;
+      })
+      .catch((err) => {
+        res.status(500).send();
+      })
+  }
+
+  updateByUserId(req, res) {
+    return dbInstance
+      .updateByUserId(req.params.goalID, req.params.userID, req.body)
+      .then((result) => {
+        if (!result.result.n) {
+          res.status(404).send();
+          return;
+        }
+        res.status(200).send();
+      })
+      .catch((err) => {
+        if (err.message === `BAD USER ID`) {
+          res.status(400).send();
+          return;
+        }
+        throw err;
+      })
+      .catch((err) => {
+        if (err.message === `BAD GOAL ID`) {
+          res.status(400).send();
+          return;
+        }
+        throw err;
+      })
+      .catch((err) => {
+        res.status(500).send();
+      })
   }
 
   add(req, res) {
