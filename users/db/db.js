@@ -69,16 +69,20 @@ export default class db {
   insertOne(item) {
     const filteredItem = {};
     for (const field in userTemplate) {
-      if (field === "monthStats") {
-        filteredUpdates[field] = {};
+      if (field === 'monthStats' && item.hasOwnProperty('monthStats') && typeof item.monthStats === 'object') {
+        filteredItem[field] = {};
         for (const field in userTemplate.monthStats) {
-          filteredUpdates.monthStats[field] = item[field];
+          filteredItem.monthStats[field] = item.monthStats[field];
         }
-      } else {
-        filteredUpdates[field] = item[field];
+      }
+      else if (field === 'monthStats') {
+        filteredItem[field] = userTemplate.monthStats;
+      }
+      else {
+        filteredItem[field] = item[field];
       }
     }
-    return this.dbPromise.then(db => db.insertOne(filterItem(filteredItem)));
+    return this.dbPromise.then(db => db.insertOne(filteredItem));
   }
 
   updateById(id, updates) {
@@ -87,23 +91,31 @@ export default class db {
     }
     const filteredUpdates = {};
     for (const field in userTemplate) {
-      if (updates.hasOwnProperty(field)) {
-        if (field === "monthStats") {
-          filteredUpdates[field] = {};
-          for (const field in userTemplate.monthStats) {
-            if (updates.monthStats.hasOwnProperty(field)) {
-              filteredUpdates.monthStats[field] = updates[field];
-            }
-          }
-        } else {
-          filteredUpdates[field] = updates[field];
+      if (updates.hasOwnProperty(field) && field !== 'monthStats') {
+        filteredUpdates[field] = updates[field];
+      }
+    }
+    const filteredMonthStatsUpdates = {};
+    if (updates.hasOwnProperty('monthStats') && typeof updates.monthStats === 'object') {
+      for (const field in userTemplate.monthStats) {
+        if (updates.monthStats.hasOwnProperty(field)) {
+          filteredMonthStatsUpdates[field] = updates.monthStats[field];
         }
       }
     }
+    let updatedItem;
     return this.dbPromise
       .then((db) => {
-        return db.updateOne({ "_id": MongoDB.ObjectId(id) }, { $set: filteredUpdates });
-      });
+        return db.findOne({ "_id": MongoDB.ObjectId(id) });
+      })
+      .then((item) => {
+        updatedItem = Object.assign(item, filteredUpdates);
+        updatedItem.monthStats = Object.assign(item.monthStats, filteredMonthStatsUpdates);
+      })
+      .then(() => this.dbPromise)
+      .then((db) => {
+        return db.updateOne({ "_id": MongoDB.ObjectId(id) }, { $set: updatedItem });
+      })
   }
 
   deleteById(id) {

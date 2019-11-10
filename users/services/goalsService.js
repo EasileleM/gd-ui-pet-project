@@ -1,7 +1,5 @@
-import db from '../db/db';
 import axios from 'axios';
 
-const dbInstance = new db();
 const goalsServiceURI = `http://localhost:4000/goals`;
 
 export default class goalService {

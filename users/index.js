@@ -6,4 +6,4 @@ const port = 4800;
 
 app.use('/users', usersRouter);
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+app.listen(port, () => console.log(`Listening on port ${port}\nURL: http://localhost:${port}`));

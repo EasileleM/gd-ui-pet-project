@@ -1,11 +1,14 @@
 import express from 'express';
 import {goalsRouter} from './goalsRouter';
+import usersService from '../services/usersService';
 import cors from 'cors';
 
 const repassUserID = (req, res, next) => {
   req.userID = req.params.userID;
   next();
 }
+
+const usersServiceInstance = new usersService();
 
 export const usersRouter = express.Router()
 
@@ -16,16 +19,16 @@ usersRouter.use(express.json());
 usersRouter.use('/:userID/goals', repassUserID, goalsRouter);
 
 // all users
-usersRouter.get('/', (req, res) => res.send('Hello World!'));
+usersRouter.get('/', usersServiceInstance.getAll);
 
 // user by id
-usersRouter.get('/:userID', (req, res) => res.send("da"));
+usersRouter.get('/:userID', usersServiceInstance.getById);
 
 // delete user by id
-usersRouter.delete('/remove/:userID', (req, res) => res.send('da'));
+usersRouter.delete('/remove/:userID', usersServiceInstance.delete);
 
 // add user by id
-usersRouter.post('/add/:userID', (req, res) => res.send('da'));
+usersRouter.post('/add', usersServiceInstance.add);
 
 // update user by id
-usersRouter.patch('/update/:userID', (req, res) => res.send('da'));
+usersRouter.patch('/update/:userID', usersServiceInstance.update);
