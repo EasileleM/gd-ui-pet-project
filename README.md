@@ -1,1 +1,1 @@
-Crud pet project
+Node js CRUD application with express framework. It is backend for planner app, consists of two microservices - goals and users. Users can have name, surname, balance, wage, purchase history, goals (like buying a car and etc) and etc. Goals have name, duration, price, creation date and etc.
