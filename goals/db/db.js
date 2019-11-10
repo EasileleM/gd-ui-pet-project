@@ -35,7 +35,7 @@ export default class db {
     return client.db(dbName).collection(collectionName);
   }
 
-  getAll(collection) {
+  getAll() {
     return this.dbPromise.then(db => {
       return db
         .find({})
@@ -63,6 +63,20 @@ export default class db {
     })
   }
 
+  getUserGoalById(goalID, userID) {
+    if (!MongoDB.ObjectId.isValid(userID)) {
+      return Promise.reject(new Error(`BAD USER ID`));
+    }
+    if (!MongoDB.ObjectId.isValid(goalID)) {
+      return Promise.reject(new Error(`BAD GOAL ID`));
+    }
+    return this.dbPromise.then(db => {
+      return db
+        .find({ "_id": MongoDB.ObjectId(goalID), "userId": MongoDB.ObjectId(userID) })
+        .toArray();
+    })
+  }
+
   getAmount(amount) {
     return this.dbPromise.then(db => {
       return db
@@ -72,12 +86,16 @@ export default class db {
     });
   }
 
-  insertOne(item) {
+  insertOne(item, userID) {
+    if (!MongoDB.ObjectId.isValid(userID)) {
+      return Promise.reject(new Error(`BAD USER ID`));
+    }
     const filteredItem = {};
     for (const field in goalTemplate) {
       filteredItem[field] = item[field];
     }
-    return this.dbPromise.then(db => db.insertOne(filterItem(filteredItem)));
+    filteredItem.userId = userID;
+    return this.dbPromise.then(db => db.insertOne(filteredItem));
   }
 
   updateById(id, updates) {
@@ -103,6 +121,19 @@ export default class db {
     return this.dbPromise
       .then((db) => {
         return db.deleteOne({ "_id": MongoDB.ObjectId(id) });
+      });
+  }
+
+  deleteUserGoalById(goalID, userID) {
+    if (!MongoDB.ObjectId.isValid(userID)) {
+      return Promise.reject(new Error(`BAD USER ID`));
+    }
+    if (!MongoDB.ObjectId.isValid(goalID)) {
+      return Promise.reject(new Error(`BAD GOAL ID`));
+    }
+    return this.dbPromise
+      .then((db) => {
+        return db.deleteOne({ "_id": MongoDB.ObjectId(goalID), "userId": MongoDB.ObjectId(userID) });
       });
   }
 }

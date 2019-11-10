@@ -1,6 +1,11 @@
 import express from 'express';
+import cors from 'cors';
 
 export const usersRouter = express.Router()
+
+goalsRouter.use(cors());
+
+goalsRouter.use(express.json());
 
 // all users
 usersRouter.get('/', (req, res) => res.send('Hello World!'));

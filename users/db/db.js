@@ -40,7 +40,7 @@ export default class db {
     return client.db(dbName).collection(collectionName);
   }
 
-  getAll(collection) {
+  getAll() {
     return this.dbPromise.then(db => {
       return db
         .find({})
@@ -72,10 +72,10 @@ export default class db {
       if (field === "monthStats") {
         filteredUpdates[field] = {};
         for (const field in userTemplate.monthStats) {
-          filteredUpdates.monthStats[field] = updates[field];
+          filteredUpdates.monthStats[field] = item[field];
         }
       } else {
-        filteredUpdates[field] = updates[field];
+        filteredUpdates[field] = item[field];
       }
     }
     return this.dbPromise.then(db => db.insertOne(filterItem(filteredItem)));

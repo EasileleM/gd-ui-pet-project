@@ -1,6 +1,11 @@
 import express from 'express';
+import cors from 'cors';
 
 export const goalsRouter = express.Router();
+
+goalsRouter.use(cors());
+
+goalsRouter.use(express.json());
 
 // goals by user id
 goalsRouter.get('/', (req, res) => res.send('dvaa'));
